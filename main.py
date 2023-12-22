@@ -6,7 +6,7 @@ from tkcalendar import Calendar
 import ast
 import socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 7001)  # Replace with the server's IP address and port number
+server_address = ('192.168.64.5', 7001)  # Replace with the server's IP address and port number
 client_socket.connect(server_address)
 
 ABOUT_TEXT = """ Here you can to find out which level to choose. Select your level, from A1 English level (elementary) to C1 English level (advanced), and improve your reading skills at your own speed, whenever it's convenient for you."""
