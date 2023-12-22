@@ -3,13 +3,10 @@ from tkinter import messagebox
 # import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
+import ast
 import socket
-
-# Create a socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# Connect to the server
-server_address = ('localhost', 12345)  # Replace with the server's IP address and port number
+server_address = ('localhost', 7001)  # Replace with the server's IP address and port number
 client_socket.connect(server_address)
 
 ABOUT_TEXT = """ Here you can to find out which level to choose. Select your level, from A1 English level (elementary) to C1 English level (advanced), and improve your reading skills at your own speed, whenever it's convenient for you."""
@@ -107,10 +104,11 @@ class Authentification:
     def sign_up(self):
         username = self.username.get()
         password = self.password.get()
+        print(type(username), type(password))
         confirm_password = self.confirm_password.get()
-        message = f"""Insert into "user"(name, password) Values({username}, {password})"""
+        message = f"""-- Insert into "user"(name, password) Values({username}, {password})"""
         client_socket.send(message.encode())
-        # response = client_socket.recv(1024).decode()
+        response = client_socket.recv(1024).decode()
         print(username, password, confirm_password)
         if password != 'Password' and username != 'Username' and confirm_password != 'Confirm Password':
             if password == confirm_password:
@@ -124,13 +122,13 @@ class Authentification:
     def sign_in(self):
         username = self.username.get()
         password = self.password.get()
-        message = f'Select * from "user" where name == {username}'
+        message = f'Select * from "user" where name = {username}'
         client_socket.send(message.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        response = ast.literal_eval(response)
 
         if password != 'Password' and username != 'Username':
-            if response['password'] == password and response['username'] == username and response['role'] == 'ADMIN':
+            if response[0]['password'] == password and response[0]['username'] == username and response[0]['role'] == 'ADMIN':
                 messagebox.showinfo("Sign In", f"Welcome back, {username}")
                 self.label.place_forget()
                 self.sign_in_frame.place_forget()
@@ -382,4 +380,4 @@ if __name__ == '__main__':
     # admin = AdminPanel(window)
     # user = User(window)
     window.mainloop()
-    client_socket.close()
+    # client_socket.close()
