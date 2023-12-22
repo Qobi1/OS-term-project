@@ -3,12 +3,16 @@ from tkinter import messagebox
 # import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
+import socket
 
-ABOUT_TEXT = """    Here you can find activities to practise your reading skills. Reading will help you to improve your understanding of the language and build your vocabulary.
+# Create a socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-The self-study lessons in this section are written and organised by English level based on the Common European Framework of Reference for languages (CEFR). There are different types of texts and interactive exercises that practise the reading skills you need to do well in your studies, to get ahead at work and to communicate in English in your free time.
+# Connect to the server
+server_address = ('localhost', 12345)  # Replace with the server's IP address and port number
+client_socket.connect(server_address)
 
-Take our free online English test to find out which level to choose. Select your level, from A1 English level (elementary) to C1 English level (advanced), and improve your reading skills at your own speed, whenever it's convenient for you."""
+ABOUT_TEXT = """ Here you can to find out which level to choose. Select your level, from A1 English level (elementary) to C1 English level (advanced), and improve your reading skills at your own speed, whenever it's convenient for you."""
 
 
 class Authentification:
@@ -104,13 +108,14 @@ class Authentification:
         username = self.username.get()
         password = self.password.get()
         confirm_password = self.confirm_password.get()
-        response = {}
+        message = f"""Insert into "user"(name, password) Values({username}, {password})"""
+        client_socket.send(message.encode())
+        # response = client_socket.recv(1024).decode()
         print(username, password, confirm_password)
         if password != 'Password' and username != 'Username' and confirm_password != 'Confirm Password':
             if password == confirm_password:
-                if response['name'] == username and response['password'] == password:
-                    messagebox.showinfo("Sign Up", f"Account created for {username}")
-                    User(self.window)
+                messagebox.showinfo("Sign Up", f"Account created for {username}")
+                User(self.window)
             else:
                 messagebox.showinfo("Sign Up", f"Password doesn't match to each other. Please check again!")
         else:
@@ -119,7 +124,10 @@ class Authentification:
     def sign_in(self):
         username = self.username.get()
         password = self.password.get()
-        response = {}
+        message = f'Select * from "user" where name == {username}'
+        client_socket.send(message.encode())
+        response = client_socket.recv(1024).decode()
+        print(response)
 
         if password != 'Password' and username != 'Username':
             if response['password'] == password and response['username'] == username and response['role'] == 'ADMIN':
@@ -374,3 +382,4 @@ if __name__ == '__main__':
     # admin = AdminPanel(window)
     # user = User(window)
     window.mainloop()
+    client_socket.close()
