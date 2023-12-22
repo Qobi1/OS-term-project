@@ -104,11 +104,13 @@ class Authentification:
         username = self.username.get()
         password = self.password.get()
         confirm_password = self.confirm_password.get()
+        response = {}
         print(username, password, confirm_password)
         if password != 'Password' and username != 'Username' and confirm_password != 'Confirm Password':
             if password == confirm_password:
-                messagebox.showinfo("Sign Up", f"Account created for {username}")
-                User(self.window)
+                if response['name'] == username and response['password'] == password:
+                    messagebox.showinfo("Sign Up", f"Account created for {username}")
+                    User(self.window)
             else:
                 messagebox.showinfo("Sign Up", f"Password doesn't match to each other. Please check again!")
         else:
@@ -117,14 +119,21 @@ class Authentification:
     def sign_in(self):
         username = self.username.get()
         password = self.password.get()
-        if password and username:
-            messagebox.showinfo("Sign In", f"Welcome back, {username}")
-            self.label.place_forget()
-            self.sign_in_frame.place_forget()
-            # window.destroy()
-            AdminPanel(window)
+        response = {}
+
+        if password != 'Password' and username != 'Username':
+            if response['password'] == password and response['username'] == username and response['role'] == 'ADMIN':
+                messagebox.showinfo("Sign In", f"Welcome back, {username}")
+                self.label.place_forget()
+                self.sign_in_frame.place_forget()
+                AdminPanel(window)
+            elif response['password'] == password and response['username'] == username and response['role'] == 'USER':
+                messagebox.showinfo("Sign In", f"Welcome back, {username}")
+                self.label.place_forget()
+                self.sign_in_frame.place_forget()
+                User(window)
         else:
-            messagebox.showinfo("Sign In", f"Input Username and/or Password")
+            messagebox.showinfo("Sign In", f"Input values for Username and/or Password")
 
 
 class AdminPanel:
